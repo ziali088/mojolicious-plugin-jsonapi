@@ -1,2 +1,9 @@
-# mojolicious-plugin-jsonapi
-Mojolicious Plugin for JSON API
+# NAME
+
+Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API compliant applications
+
+# VERSION
+
+# SYNOPSIS
+
+# METHODS
