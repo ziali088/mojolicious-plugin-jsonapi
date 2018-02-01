@@ -6,6 +6,9 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 sub register {
     my ($self, $app, $args) = @_;
+
+    # Add detection for application/vnd.api+json content type, fallback to application/json
+    $app->types->type(json => [ 'application/vnd.api+json', 'application/json' ]);
 }
 
 1;
