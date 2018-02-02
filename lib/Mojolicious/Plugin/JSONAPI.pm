@@ -2,6 +2,8 @@ package Mojolicious::Plugin::JSONAPI;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
+use Carp ();
+
 # ABSTRACT: Mojolicious Plugin for building JSON API compliant applications.
 
 sub register {
@@ -9,6 +11,19 @@ sub register {
 
     # Add detection for application/vnd.api+json content type, fallback to application/json
     $app->types->type(json => [ 'application/vnd.api+json', 'application/json' ]);
+
+    $self->create_route_helpers($app);
+}
+
+sub create_route_helpers {
+    my ($self, $app) = @_;
+
+    $app->helper(resource_routes => sub {
+        my ($self, $spec) = @_;
+        $spec->{resource} || Carp::confess('resource is a required param');
+        $spec->{controller} ||= 'api-' . $spec->{resource};
+        $spec->{relationships} ||= [];
+    });
 }
 
 1;
@@ -36,5 +51,18 @@ The specification takes backwards compatability pretty seriously, so your app sh
 plugin without much issue.
 
 =head1 METHODS
+
+=head2 resource_routes(HashRef $spec)
+
+Creates a set of routes for the given resource. C<$spec> is a hash reference of the resources specification
+with the following options:
+
+    {
+        resource        => 'posts', # name of resource, required
+        controller      => 'api-posts', # name of controller, defaults to 'api-' . $spec->{resource}
+        relationships   => ['comments'],
+    }
+
+Specifying C<relationships> will create additional routes that fall under the resource.
 
 =cut

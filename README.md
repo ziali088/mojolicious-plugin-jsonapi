@@ -17,3 +17,16 @@ The specification takes backwards compatability pretty seriously, so your app sh
 plugin without much issue.
 
 # METHODS
+
+## resource\_routes(HashRef $spec)
+
+Creates a set of routes for the given resource. `$spec` is a hash reference of the resources specification
+with the following options:
+
+    {
+        resource        => 'posts', # name of resource, required
+        controller      => 'api-posts', # name of controller, defaults to 'api-' . $spec->{resource}
+        relationships   => ['comments'],
+    }
+
+Specifying `relationships` will create additional routes that fall under the resource.
