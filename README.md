@@ -6,6 +6,38 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 # SYNOPSIS
 
+    # Mojolicious
+
+    # Using route helpers
+
+    sub startup {
+        my ($self) = @_;
+
+        $self->plugin('JSONAPI');
+
+        # Create the following routes:
+
+        # GET '/posts'
+        # POST '/posts'
+        # PATCH '/posts/:post_id
+        # DELETE '/posts/:post_id
+
+        # GET '/posts/:post_id/relationships/author'
+        # POST '/posts/:post_id/relationships/author'
+        # PATCH '/posts/:post_id/relationships/author'
+        # DELETE '/posts/:post_id/relationships/author'
+
+        # GET '/posts/:post_id/relationships/comments'
+        # POST '/posts/:post_id/relationships/comments'
+        # PATCH '/posts/:post_id/relationships/comments'
+        # DELETE '/posts/:post_id/relationships/comments'
+
+        $self->resource_routes({
+            resource => 'post',
+            relationships => ['author', 'comments'],
+        });
+    }
+
 # DESCRIPTION
 
 This module intends to supply the user with helper methods that can be used to build JSON API
@@ -16,17 +48,27 @@ See [http://jsonapi.org/](http://jsonapi.org/) for the JSON API specification. A
 The specification takes backwards compatability pretty seriously, so your app should be able to use this
 plugin without much issue.
 
+`Mojolicious::Lite` is not supported yet as I personally felt that if you're dealing with database schemas
+and converting them into strict JSON structures, that's enough for you to say let's migrate to `Mojolicious`.
+
 # METHODS
 
-## resource\_routes(HashRef $spec)
+## resource\_routes(_HashRef_ $spec)
 
 Creates a set of routes for the given resource. `$spec` is a hash reference of the resources specification
 with the following options:
 
     {
-        resource        => 'posts', # name of resource, required
+        resource        => 'post', # name of resource, required
+        namespace       => 'api', # namespace to create the resource under i.e. '/api/posts'. default is 'api'
         controller      => 'api-posts', # name of controller, defaults to 'api-' . $spec->{resource}
-        relationships   => ['comments'],
+        relationships   => ['author', 'comments'], # default is []
     }
 
+`resource` should be a singular noun, which will be turned into it's pluralised version (e.g. "post" -> "posts").
+
 Specifying `relationships` will create additional routes that fall under the resource.
+
+**NOTE**: Your relationships should be in the correct form (singular/plural) based on the relationship in your
+schema management system. So if you have a resource called "post" and it `has_many` "comments", make sure
+comments is passed in as a plural noun (same for `belongs_to`).
