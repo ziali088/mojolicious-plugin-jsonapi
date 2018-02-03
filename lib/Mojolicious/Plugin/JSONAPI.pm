@@ -9,33 +9,33 @@ use Lingua::EN::Inflexion ();
 
 sub register {
     my ($self, $app, $args) = @_;
+    $args ||= {};
 
-    # Add detection for application/vnd.api+json content type, fallback to application/json
+    # Detect application/vnd.api+json content type, fallback to application/json
     $app->types->type(json => [ 'application/vnd.api+json', 'application/json' ]);
 
-    $self->create_route_helpers($app);
+    my $namespace = exists($args->{namespace}) ? $args->{namespace} : 'api';
+    $self->create_route_helpers($app, $namespace);
 }
 
 sub create_route_helpers {
-    my ($self, $app) = @_;
+    my ($self, $app, $namespace) = @_;
 
     $app->helper(resource_routes => sub {
         my ($self, $spec) = @_;
         $spec->{resource} || Carp::confess('resource is a required param');
-        $spec->{namespace} ||= 'api';
-        $spec->{controller} ||= 'api-' . $spec->{resource};
         $spec->{relationships} ||= [];
 
         my $resource = Lingua::EN::Inflexion::noun($spec->{resource});
         my $resource_singular = $resource->singular;
         my $resource_plural = $resource->plural;
 
-        my $r = $app->routes->under( sprintf('/%s/%s', $spec->{namespace}, $resource_plural) )->to(controller => $spec->{controller});
+        my $base_path = $namespace ? "/$namespace/$resource_plural" : "/$resource_plural";
+        my $controller = $spec->{controller} || "api-$resource_plural";
 
+        my $r = $app->routes->under($base_path)->to(controller => $controller);
         $r->get('/')->to(action => "search_${resource_plural}");
-
         $r->post('/')->to(action => "create_${resource_singular}");
-
         foreach my $method ( qw/get patch delete/ ) {
             $r->$method("/:${resource_singular}_id")->to(action => "${method}_${resource_singular}");
         }
@@ -70,29 +70,29 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
     sub startup {
         my ($self) = @_;
 
-        $self->plugin('JSONAPI');
-
-        # Create the following routes:
-
-        # GET '/posts'
-        # POST '/posts'
-        # PATCH '/posts/:post_id
-        # DELETE '/posts/:post_id
-
-        # GET '/posts/:post_id/relationships/author'
-        # POST '/posts/:post_id/relationships/author'
-        # PATCH '/posts/:post_id/relationships/author'
-        # DELETE '/posts/:post_id/relationships/author'
-
-        # GET '/posts/:post_id/relationships/comments'
-        # POST '/posts/:post_id/relationships/comments'
-        # PATCH '/posts/:post_id/relationships/comments'
-        # DELETE '/posts/:post_id/relationships/comments'
+        $self->plugin('JSONAPI', { namespace => 'api' });
 
         $self->resource_routes({
             resource => 'post',
             relationships => ['author', 'comments'],
         });
+
+        # Creates the following routes:
+
+        # GET '/api/posts'
+        # POST '/api/posts'
+        # PATCH '/api/posts/:post_id
+        # DELETE '/api/posts/:post_id
+
+        # GET '/api/posts/:post_id/relationships/author'
+        # POST '/api/posts/:post_id/relationships/author'
+        # PATCH '/api/posts/:post_id/relationships/author'
+        # DELETE '/api/posts/:post_id/relationships/author'
+
+        # GET '/api/posts/:post_id/relationships/comments'
+        # POST '/api/posts/:post_id/relationships/comments'
+        # PATCH '/api/posts/:post_id/relationships/comments'
+        # DELETE '/api/posts/:post_id/relationships/comments'
     }
 
 =head1 DESCRIPTION
@@ -108,6 +108,16 @@ plugin without much issue.
 C<Mojolicious::Lite> is not supported yet as I personally felt that if you're dealing with database schemas
 and converting them into strict JSON structures, that's enough for you to think about migrating to C<Mojolicious>.
 
+=head1 ATTRIBUTES
+
+=over
+
+=item namespace
+
+The prefix that's added to all routes, defaults to 'api'.
+
+=back
+
 =head1 METHODS
 
 =head2 resource_routes(I<HashRef> $spec)
@@ -116,8 +126,7 @@ Creates a set of routes for the given resource. C<$spec> is a hash reference tha
 
     {
         resource        => 'post', # name of resource, required
-        namespace       => 'api', # namespace to create the resource under i.e. '/api/posts'. default is 'api'
-        controller      => 'api-posts', # name of controller, defaults to 'api-' . $spec->{resource}
+        controller      => 'api-posts', # name of controller, defaults to 'api-' . resource plural
         relationships   => ['author', 'comments'], # default is []
     }
 

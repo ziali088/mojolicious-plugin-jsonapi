@@ -13,29 +13,29 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
     sub startup {
         my ($self) = @_;
 
-        $self->plugin('JSONAPI');
-
-        # Create the following routes:
-
-        # GET '/posts'
-        # POST '/posts'
-        # PATCH '/posts/:post_id
-        # DELETE '/posts/:post_id
-
-        # GET '/posts/:post_id/relationships/author'
-        # POST '/posts/:post_id/relationships/author'
-        # PATCH '/posts/:post_id/relationships/author'
-        # DELETE '/posts/:post_id/relationships/author'
-
-        # GET '/posts/:post_id/relationships/comments'
-        # POST '/posts/:post_id/relationships/comments'
-        # PATCH '/posts/:post_id/relationships/comments'
-        # DELETE '/posts/:post_id/relationships/comments'
+        $self->plugin('JSONAPI', { namespace => 'api' });
 
         $self->resource_routes({
             resource => 'post',
             relationships => ['author', 'comments'],
         });
+
+        # Creates the following routes:
+
+        # GET '/api/posts'
+        # POST '/api/posts'
+        # PATCH '/api/posts/:post_id
+        # DELETE '/api/posts/:post_id
+
+        # GET '/api/posts/:post_id/relationships/author'
+        # POST '/api/posts/:post_id/relationships/author'
+        # PATCH '/api/posts/:post_id/relationships/author'
+        # DELETE '/api/posts/:post_id/relationships/author'
+
+        # GET '/api/posts/:post_id/relationships/comments'
+        # POST '/api/posts/:post_id/relationships/comments'
+        # PATCH '/api/posts/:post_id/relationships/comments'
+        # DELETE '/api/posts/:post_id/relationships/comments'
     }
 
 # DESCRIPTION
@@ -51,6 +51,12 @@ plugin without much issue.
 `Mojolicious::Lite` is not supported yet as I personally felt that if you're dealing with database schemas
 and converting them into strict JSON structures, that's enough for you to think about migrating to `Mojolicious`.
 
+# ATTRIBUTES
+
+- namespace
+
+    The prefix that's added to all routes, defaults to 'api'.
+
 # METHODS
 
 ## resource\_routes(_HashRef_ $spec)
@@ -59,8 +65,7 @@ Creates a set of routes for the given resource. `$spec` is a hash reference that
 
     {
         resource        => 'post', # name of resource, required
-        namespace       => 'api', # namespace to create the resource under i.e. '/api/posts'. default is 'api'
-        controller      => 'api-posts', # name of controller, defaults to 'api-' . $spec->{resource}
+        controller      => 'api-posts', # name of controller, defaults to 'api-' . resource plural
         relationships   => ['author', 'comments'], # default is []
     }
 

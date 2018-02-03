@@ -5,8 +5,6 @@ use Test::Most;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-plugin 'JSONAPI';
-
 use Data::Dumper;
 
 my $method_status_map = {
@@ -42,47 +40,89 @@ app->hook(after_dispatch => sub {
     );
 });
 
-subtest 'resource with relationships' => sub {
-    $PARAM_ID = 'post_id';
+{
+    plugin 'JSONAPI';
 
-    app->resource_routes({
-        resource => 'post',
-        relationships => ['author', 'comments'],
-    });
+    subtest 'resource with relationships' => sub {
+        $PARAM_ID = 'post_id';
 
-    my $t = Test::Mojo->new();
+        app->resource_routes({
+            resource => 'post',
+            relationships => ['author', 'comments'],
+        });
 
-    $t->get_ok('/api/posts')->status_is(200);
-    $t->post_ok('/api/posts')->status_is(201);
+        my $t = Test::Mojo->new();
 
-    $t->get_ok('/api/posts/20')->status_is(200);
-    $t->patch_ok('/api/posts/20')->status_is(200);
-    $t->delete_ok('/api/posts/20')->status_is(200);
+        $t->get_ok('/api/posts')->status_is(200);
+        $t->post_ok('/api/posts')->status_is(201);
 
-    $t->get_ok('/api/posts/20/relationships/author')->status_is(200);
-    $t->post_ok('/api/posts/20/relationships/author')->status_is(201);
-    $t->patch_ok('/api/posts/20/relationships/author')->status_is(200);
-    $t->delete_ok('/api/posts/20/relationships/author')->status_is(200);
+        $t->get_ok('/api/posts/20')->status_is(200);
+        $t->patch_ok('/api/posts/20')->status_is(200);
+        $t->delete_ok('/api/posts/20')->status_is(200);
 
-    $t->get_ok('/api/posts/20/relationships/comments')->status_is(200);
-    $t->post_ok('/api/posts/20/relationships/comments')->status_is(201);
-    $t->patch_ok('/api/posts/20/relationships/comments')->status_is(200);
-    $t->delete_ok('/api/posts/20/relationships/comments')->status_is(200);
-};
+        $t->get_ok('/api/posts/20/relationships/author')->status_is(200);
+        $t->post_ok('/api/posts/20/relationships/author')->status_is(201);
+        $t->patch_ok('/api/posts/20/relationships/author')->status_is(200);
+        $t->delete_ok('/api/posts/20/relationships/author')->status_is(200);
 
-subtest 'singular resource name to plural' => sub {
-    $PARAM_ID = 'person_id';
+        $t->get_ok('/api/posts/20/relationships/comments')->status_is(200);
+        $t->post_ok('/api/posts/20/relationships/comments')->status_is(201);
+        $t->patch_ok('/api/posts/20/relationships/comments')->status_is(200);
+        $t->delete_ok('/api/posts/20/relationships/comments')->status_is(200);
+    };
 
-    app->resource_routes({
-        resource => 'person',
-    });
+    subtest 'singular resource name to plural' => sub {
+        $PARAM_ID = 'person_id';
 
-    my $t = Test::Mojo->new();
+        app->resource_routes({
+            resource => 'person',
+        });
 
-    $t->get_ok('/api/people')->status_is(200);
-    $t->post_ok('/api/people')->status_is(201);
-    $t->patch_ok('/api/people/20')->status_is(200);
-    $t->delete_ok('/api/people/20')->status_is(200);
-};
+        my $t = Test::Mojo->new();
+
+        $t->get_ok('/api/people')->status_is(200);
+        $t->post_ok('/api/people')->status_is(201);
+        $t->patch_ok('/api/people/20')->status_is(200);
+        $t->delete_ok('/api/people/20')->status_is(200);
+    };
+}
+
+{
+    plugin 'JSONAPI', { namespace => '' };
+
+    subtest 'empty namespace permitted' => sub {
+        $PARAM_ID = 'person_id';
+
+        app->resource_routes({
+            resource => 'person',
+        });
+
+        my $t = Test::Mojo->new();
+
+        $t->get_ok('/people')->status_is(200);
+        $t->post_ok('/people')->status_is(201);
+        $t->patch_ok('/people/20')->status_is(200);
+        $t->delete_ok('/people/20')->status_is(200);
+    };
+}
+
+{
+    plugin 'JSONAPI', { namespace => 'api/v1' };
+
+    subtest 'custom namespace permitted' => sub {
+        $PARAM_ID = 'person_id';
+
+        app->resource_routes({
+            resource => 'person',
+        });
+
+        my $t = Test::Mojo->new();
+
+        $t->get_ok('/api/v1/people')->status_is(200);
+        $t->post_ok('/api/v1/people')->status_is(201);
+        $t->patch_ok('/api/v1/people/20')->status_is(200);
+        $t->delete_ok('/api/v1/people/20')->status_is(200);
+    };
+}
 
 done_testing;
