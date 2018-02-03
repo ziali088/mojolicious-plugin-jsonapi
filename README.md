@@ -49,7 +49,7 @@ The specification takes backwards compatability pretty seriously, so your app sh
 plugin without much issue.
 
 `Mojolicious::Lite` is not supported yet as I personally felt that if you're dealing with database schemas
-and converting them into strict JSON structures, that's enough for you to say let's migrate to `Mojolicious`.
+and converting them into strict JSON structures, that's enough for you to think about migrating to `Mojolicious`.
 
 # METHODS
 
