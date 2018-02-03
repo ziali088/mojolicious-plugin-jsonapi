@@ -20,7 +20,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
             relationships => ['author', 'comments'],
         });
 
-        # Creates the following routes:
+        # Now the following routes are available:
 
         # GET '/api/posts'
         # POST '/api/posts'
@@ -51,11 +51,12 @@ plugin without much issue.
 `Mojolicious::Lite` is not supported yet as I personally felt that if you're dealing with database schemas
 and converting them into strict JSON structures, that's enough for you to think about migrating to `Mojolicious`.
 
-# ATTRIBUTES
+# OPTIONS
 
-- namespace
+- `namespace`
 
-    The prefix that's added to all routes, defaults to 'api'.
+    The prefix that's added to all routes, defaults to 'api'. You can also provided an empty string as the namespace,
+    meaing no prefix will be added.
 
 # METHODS
 
@@ -65,7 +66,7 @@ Creates a set of routes for the given resource. `$spec` is a hash reference that
 
     {
         resource        => 'post', # name of resource, required
-        controller      => 'api-posts', # name of controller, defaults to 'api-' . resource plural
+        controller      => 'api-posts', # name of controller, defaults to "api-{resource_plural}"
         relationships   => ['author', 'comments'], # default is []
     }
 
@@ -74,5 +75,5 @@ Creates a set of routes for the given resource. `$spec` is a hash reference that
 Specifying `relationships` will create additional routes that fall under the resource.
 
 **NOTE**: Your relationships should be in the correct form (singular/plural) based on the relationship in your
-schema management system. So if you have a resource called "post" and it `has_many` "comments", make sure
-comments is passed in as a plural noun (same for `belongs_to`).
+schema management system. For example, if you have a resource called 'post' and it has many comments, make
+sure comments is passed in as a plural noun.

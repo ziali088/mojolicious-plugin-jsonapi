@@ -77,7 +77,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
             relationships => ['author', 'comments'],
         });
 
-        # Creates the following routes:
+        # Now the following routes are available:
 
         # GET '/api/posts'
         # POST '/api/posts'
@@ -108,13 +108,14 @@ plugin without much issue.
 C<Mojolicious::Lite> is not supported yet as I personally felt that if you're dealing with database schemas
 and converting them into strict JSON structures, that's enough for you to think about migrating to C<Mojolicious>.
 
-=head1 ATTRIBUTES
+=head1 OPTIONS
 
 =over
 
-=item namespace
+=item C<namespace>
 
-The prefix that's added to all routes, defaults to 'api'.
+The prefix that's added to all routes, defaults to 'api'. You can also provided an empty string as the namespace,
+meaing no prefix will be added.
 
 =back
 
@@ -126,7 +127,7 @@ Creates a set of routes for the given resource. C<$spec> is a hash reference tha
 
     {
         resource        => 'post', # name of resource, required
-        controller      => 'api-posts', # name of controller, defaults to 'api-' . resource plural
+        controller      => 'api-posts', # name of controller, defaults to "api-{resource_plural}"
         relationships   => ['author', 'comments'], # default is []
     }
 
@@ -135,7 +136,7 @@ C<resource> should be a singular noun, which will be turned into it's pluralised
 Specifying C<relationships> will create additional routes that fall under the resource.
 
 B<NOTE>: Your relationships should be in the correct form (singular/plural) based on the relationship in your
-schema management system. So if you have a resource called "post" and it C<has_many> "comments", make sure
-comments is passed in as a plural noun (same for C<belongs_to>).
+schema management system. For example, if you have a resource called 'post' and it has many comments, make
+sure comments is passed in as a plural noun.
 
 =cut
