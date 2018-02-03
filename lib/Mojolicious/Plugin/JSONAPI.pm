@@ -112,8 +112,7 @@ and converting them into strict JSON structures, that's enough for you to think 
 
 =head2 resource_routes(I<HashRef> $spec)
 
-Creates a set of routes for the given resource. C<$spec> is a hash reference of the resources specification
-with the following options:
+Creates a set of routes for the given resource. C<$spec> is a hash reference that can consist of the following:
 
     {
         resource        => 'post', # name of resource, required

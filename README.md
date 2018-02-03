@@ -55,8 +55,7 @@ and converting them into strict JSON structures, that's enough for you to think 
 
 ## resource\_routes(_HashRef_ $spec)
 
-Creates a set of routes for the given resource. `$spec` is a hash reference of the resources specification
-with the following options:
+Creates a set of routes for the given resource. `$spec` is a hash reference that can consist of the following:
 
     {
         resource        => 'post', # name of resource, required
