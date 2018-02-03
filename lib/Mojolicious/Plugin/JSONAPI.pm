@@ -16,13 +16,14 @@ sub register {
 
     my $namespace = exists($args->{namespace}) ? $args->{namespace} : 'api';
     $self->create_route_helpers($app, $namespace);
+    $self->create_error_helpers($app);
 }
 
 sub create_route_helpers {
     my ($self, $app, $namespace) = @_;
 
     $app->helper(resource_routes => sub {
-        my ($self, $spec) = @_;
+        my ($c, $spec) = @_;
         $spec->{resource} || Carp::confess('resource is a required param');
         $spec->{relationships} ||= [];
 
@@ -34,8 +35,8 @@ sub create_route_helpers {
         my $controller = $spec->{controller} || "api-$resource_plural";
 
         my $r = $app->routes->under($base_path)->to(controller => $controller);
-        $r->get('/')->to(action => "search_${resource_plural}");
-        $r->post('/')->to(action => "create_${resource_singular}");
+        $r->get('/')->to(action => "fetch_${resource_plural}");
+        $r->post('/')->to(action => "post_${resource_singular}");
         foreach my $method ( qw/get patch delete/ ) {
             $r->$method("/:${resource_singular}_id")->to(action => "${method}_${resource_singular}");
         }
@@ -46,6 +47,34 @@ sub create_route_helpers {
                 $r->$method($path)->to(action => "${method}_related_${relationship}");
             }
         }
+    });
+}
+
+sub create_error_helpers {
+    my ($self, $app) = @_;
+
+    $app->helper(render_error => sub {
+        my ($c, $status, $errors, $data, $meta) = @_;
+
+        unless ( $errors || ref($errors) ne 'ARRAY' ) {
+            $errors = [{
+                status  => 500,
+                title   => 'Error processing request',
+                meta    => {
+                    detail      => 'No specific error details provided',
+                    ref_type    => ref($errors) . '',
+                }
+            }];
+        }
+
+        return $c->render(
+            status => $status || 500,
+            json => {
+                $data ? ( data => $data ) : (),
+                $meta ? ( meta => $meta ) : (),
+                errors => $errors,
+            }
+        );
     });
 }
 
@@ -119,7 +148,7 @@ meaing no prefix will be added.
 
 =back
 
-=head1 METHODS
+=head1 HELPERS
 
 =head2 resource_routes(I<HashRef> $spec)
 
@@ -138,5 +167,13 @@ Specifying C<relationships> will create additional routes that fall under the re
 B<NOTE>: Your relationships should be in the correct form (singular/plural) based on the relationship in your
 schema management system. For example, if you have a resource called 'post' and it has many comments, make
 sure comments is passed in as a plural noun.
+
+=head2 render_error(I<Str> $status, I<ArrayRef> $errors, I<HashRef> $data. I<HashRef> $meta)
+
+Renders a JSON response under the required top-level C<errors> key. C<errors> is an array reference of error objects
+as described in the specification. See L<Error Objects|http://jsonapi.org/format/#error-objects>.
+
+Can optionally provide a reference to the primary data for the route as well as meta information, which will be added
+to the response as-is. Use C<data_for_type> to generate the right structure for this argument.
 
 =cut

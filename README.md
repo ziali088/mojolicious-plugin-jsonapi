@@ -58,7 +58,7 @@ and converting them into strict JSON structures, that's enough for you to think 
     The prefix that's added to all routes, defaults to 'api'. You can also provided an empty string as the namespace,
     meaing no prefix will be added.
 
-# METHODS
+# HELPERS
 
 ## resource\_routes(_HashRef_ $spec)
 
@@ -77,3 +77,11 @@ Specifying `relationships` will create additional routes that fall under the res
 **NOTE**: Your relationships should be in the correct form (singular/plural) based on the relationship in your
 schema management system. For example, if you have a resource called 'post' and it has many comments, make
 sure comments is passed in as a plural noun.
+
+## render\_error(_Str_ $status, _ArrayRef_ $errors, _HashRef_ $data. _HashRef_ $meta)
+
+Renders a JSON response under the required top-level `errors` key. `errors` is an array reference of error objects
+as described in the specification. See [Error Objects](http://jsonapi.org/format/#error-objects).
+
+Can optionally provide a reference to the primary data for the route as well as meta information, which will be added
+to the response as-is. Use `data_for_type` to generate the right structure for this argument.
