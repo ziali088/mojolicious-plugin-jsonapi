@@ -16,6 +16,7 @@ sub register {
 
     my $namespace = exists($args->{namespace}) ? $args->{namespace} : 'api';
     $self->create_route_helpers($app, $namespace);
+    $self->create_data_helpers($app);
     $self->create_error_helpers($app);
 }
 
@@ -50,15 +51,23 @@ sub create_route_helpers {
     });
 }
 
+sub create_data_helpers {
+    my ($self, $app) = @_;
+
+    $app->helper(resource_object => sub {
+        my ($c) = @_;
+    });
+}
+
 sub create_error_helpers {
     my ($self, $app) = @_;
 
     $app->helper(render_error => sub {
         my ($c, $status, $errors, $data, $meta) = @_;
 
-        unless ( $errors || ref($errors) ne 'ARRAY' ) {
+        unless ( defined($errors) && ref($errors) ne 'ARRAY' ) {
             $errors = [{
-                status  => 500,
+                status  => $status || 500,
                 title   => 'Error processing request',
                 meta    => {
                     detail      => 'No specific error details provided',

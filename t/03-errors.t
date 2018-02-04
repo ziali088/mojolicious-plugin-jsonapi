@@ -12,14 +12,15 @@ plugin 'JSONAPI';
 get '/' => sub {
     my $c = shift;
 
-    return $c->render_error(
-        400,
-        [{ title => '' }]
-    );
+    return $c->render_error(400);
 };
 
 my $t = Test::Mojo->new;
 
-$t->get_ok('/')->status_is(400)->json_has('/errors/0/title');
+$t->get_ok('/')->status_is(400)
+    ->json_has('/errors/0/title')
+    ->json_has('/errors/0/status')
+    ->json_has('/errors/0/meta/ref_type')
+    ->json_has('/errors/0/meta/detail');
 
 done_testing;
