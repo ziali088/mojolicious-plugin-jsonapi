@@ -210,7 +210,7 @@ Renders a JSON response under the required top-level C<errors> key. C<errors> is
 as described in the specification. See L<Error Objects|http://jsonapi.org/format/#error-objects>.
 
 Can optionally provide a reference to the primary data for the route as well as meta information, which will be added
-to the response as-is. Use C<data_for_type> to generate the right structure for this argument.
+to the response as-is. Use C<resource_document> to generate the right structure for this argument.
 
 =head2 resource_document
 

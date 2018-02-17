@@ -92,7 +92,7 @@ Renders a JSON response under the required top-level `errors` key. `errors` is a
 as described in the specification. See [Error Objects](http://jsonapi.org/format/#error-objects).
 
 Can optionally provide a reference to the primary data for the route as well as meta information, which will be added
-to the response as-is. Use `data_for_type` to generate the right structure for this argument.
+to the response as-is. Use `resource_document` to generate the right structure for this argument.
 
 ## resource\_document
 
