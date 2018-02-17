@@ -138,20 +138,21 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
         # Now the following routes are available:
 
-        # GET '/api/posts'
-        # POST '/api/posts'
-        # PATCH '/api/posts/:post_id
-        # DELETE '/api/posts/:post_id
+        # GET '/api/posts' -> to('api-posts#fetch_posts')
+        # POST '/api/posts' -> to('api-posts#post_posts')
+        # GET '/api/posts/:post_id -> to('api-posts#get_post')
+        # PATCH '/api/posts/:post_id -> to('api-posts#patch_post')
+        # DELETE '/api/posts/:post_id -> to('api-posts#delete_post')
 
-        # GET '/api/posts/:post_id/relationships/author'
-        # POST '/api/posts/:post_id/relationships/author'
-        # PATCH '/api/posts/:post_id/relationships/author'
-        # DELETE '/api/posts/:post_id/relationships/author'
+        # GET '/api/posts/:post_id/relationships/author' -> to('api-posts#get_related_author')
+        # POST '/api/posts/:post_id/relationships/author' -> to('api-posts#post_related_author')
+        # PATCH '/api/posts/:post_id/relationships/author' -> to('api-posts#patch_related_author')
+        # DELETE '/api/posts/:post_id/relationships/author' -> to('api-posts#delete_related_author')
 
-        # GET '/api/posts/:post_id/relationships/comments'
-        # POST '/api/posts/:post_id/relationships/comments'
-        # PATCH '/api/posts/:post_id/relationships/comments'
-        # DELETE '/api/posts/:post_id/relationships/comments'
+        # GET '/api/posts/:post_id/relationships/comments' -> to('api-posts#get_related_comments')
+        # POST '/api/posts/:post_id/relationships/comments' -> to('api-posts#post_related_comments')
+        # PATCH '/api/posts/:post_id/relationships/comments' -> to('api-posts#patch_related_comments')
+        # DELETE '/api/posts/:post_id/relationships/comments' -> to('api-posts#delete_related_comments')
 
         # You can use the following helpers too:
 
@@ -164,16 +165,11 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 =head1 DESCRIPTION
 
-This module intends to supply the user with helper methods that can be used to build JSON API
-compliant data structures.
+This module intends to supply the user with helper methods that can be used to build a JSON API
+compliant Mojolicious server. It helps create routes for your resources that conform with the
+specification, along with supplying helper methods to use when responding to requests.
 
 See L<http://jsonapi.org/> for the JSON API specification. At the time of writing, the version was 1.0.
-
-The specification takes backwards compatability pretty seriously, so your app should be able to use this
-plugin without much issue.
-
-C<Mojolicious::Lite> is not supported yet as I personally felt that if you're dealing with database schemas
-and converting them into strict JSON structures, that's enough for you to think about migrating to C<Mojolicious>.
 
 =head1 OPTIONS
 
@@ -201,6 +197,8 @@ Creates a set of routes for the given resource. C<$spec> is a hash reference tha
 C<resource> should be a singular noun, which will be turned into it's pluralised version (e.g. "post" -> "posts").
 
 Specifying C<relationships> will create additional routes that fall under the resource.
+
+Routes will point to controller actions, the names of which follow the pattern C<{http_method}_{resource}>.
 
 B<NOTE>: Your relationships should be in the correct form (singular/plural) based on the relationship in your
 schema management system. For example, if you have a resource called 'post' and it has many comments, make
