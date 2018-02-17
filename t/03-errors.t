@@ -19,8 +19,6 @@ my $t = Test::Mojo->new;
 
 $t->get_ok('/')->status_is(400)
     ->json_has('/errors/0/title')
-    ->json_has('/errors/0/status')
-    ->json_has('/errors/0/meta/ref_type')
-    ->json_has('/errors/0/meta/detail');
+    ->json_has('/errors/0/status');
 
 done_testing;

@@ -4,6 +4,8 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 # VERSION
 
+version 0.1
+
 # SYNOPSIS
 
     # Mojolicious
@@ -36,6 +38,14 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
         # POST '/api/posts/:post_id/relationships/comments'
         # PATCH '/api/posts/:post_id/relationships/comments'
         # DELETE '/api/posts/:post_id/relationships/comments'
+
+        # You can use the following helpers too:
+
+        $self->resource_document($dbic_row, $options);
+
+        $self->compound_resource_document($dbic_row, $options);
+
+        $self->resource_documents($dbic_resultset, $options);
     }
 
 # DESCRIPTION
@@ -85,3 +95,27 @@ as described in the specification. See [Error Objects](http://jsonapi.org/format
 
 Can optionally provide a reference to the primary data for the route as well as meta information, which will be added
 to the response as-is. Use `data_for_type` to generate the right structure for this argument.
+
+## resource\_document
+
+Available in controllers:
+
+    $c->resource_document($dbix_row, $options);
+
+See [resource\_document](https://metacpan.org/pod/JSONAPI::Document#resource_document\(DBIx::Class::Row-$row,-HashRef-$options\)) for usage.
+
+## compound\_resource\_document
+
+Available in controllers:
+
+    $c->compound_resource_document($dbix_row, $options);
+
+See [compound\_resource\_document](https://metacpan.org/pod/JSONAPI::Document#compound_resource_document\(DBIx::Class::Row-$row,-HashRef-$options\)) for usage.
+
+## resource\_documents
+
+Available in controllers:
+
+    $c->resource_documents($dbix_resultset, $options);
+
+See [resource\_documents](https://metacpan.org/pod/JSONAPI::Document#resource_documents\(DBIx::Class::Row-$row,-HashRef-$options\)) for usage.
