@@ -4,7 +4,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 # VERSION
 
-version 0.5
+version 0.6
 
 # SYNOPSIS
 
@@ -73,6 +73,11 @@ See [http://jsonapi.org/](http://jsonapi.org/) for the JSON API specification. A
 
     This is passed to the constructor of `JSONAPI::Document` which will kebab case the attribute keys of each
     record (i.e. '\_' to '-').
+
+- `attributes_via`
+
+    Also passed to the constructor of `JSONAPI::Document`. This is the method that will be used to get
+    the attributes for a resource document. Should return a hash (not a hashref).
 
 # HELPERS
 

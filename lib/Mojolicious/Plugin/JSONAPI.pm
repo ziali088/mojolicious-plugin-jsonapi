@@ -12,17 +12,23 @@ sub register {
     my ( $self, $app, $args ) = @_;
     $args ||= {};
 
-    my $jsonapi_args = {
-        kebab_case_attrs => $args->{kebab_case_attrs},
-        namespace        => $args->{namespace},
-    };
+    my %jsonapi_args;
+    if (defined($args->{kebab_case_attrs})) {
+        $jsonapi_args{kebab_case_attrs} = $args->{kebab_case_attrs};
+    }
+    if (defined($args->{namespace})) {
+        $jsonapi_args{namespace} = $args->{namespace};
+    }
+    if (defined($args->{attributes_via})) {
+        $jsonapi_args{attributes_via} = $args->{attributes_via};
+    }
 
     # Detect application/vnd.api+json content type, fallback to application/json
     $app->types->type(
         json => [ 'application/vnd.api+json', 'application/json' ] );
 
     $self->create_route_helpers( $app, $args->{namespace} );
-    $self->create_data_helpers($app, $jsonapi_args);
+    $self->create_data_helpers($app, \%jsonapi_args);
     $self->create_error_helpers($app);
 }
 
@@ -210,6 +216,11 @@ meaing no prefix will be added.
 
 This is passed to the constructor of C<JSONAPI::Document> which will kebab case the attribute keys of each
 record (i.e. '_' to '-').
+
+=item C<attributes_via>
+
+Also passed to the constructor of C<JSONAPI::Document>. This is the method that will be used to get
+the attributes for a resource document. Should return a hash (not a hashref).
 
 =back
 
