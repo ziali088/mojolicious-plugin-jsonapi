@@ -12,12 +12,17 @@ sub register {
     my ( $self, $app, $args ) = @_;
     $args ||= {};
 
+    my $jsonapi_args = {
+        kebab_case_attrs => $args->{kebab_case_attrs},
+        namespace        => $args->{namespace},
+    };
+
     # Detect application/vnd.api+json content type, fallback to application/json
     $app->types->type(
         json => [ 'application/vnd.api+json', 'application/json' ] );
 
     $self->create_route_helpers( $app, $args->{namespace} );
-    $self->create_data_helpers($app, { kebab_case_attrs => $args->{kebab_case_attrs} });
+    $self->create_data_helpers($app, $jsonapi_args);
     $self->create_error_helpers($app);
 }
 
@@ -64,26 +69,36 @@ sub create_route_helpers {
 sub create_data_helpers {
     my ( $self, $app, $args ) = @_;
 
-    my $jsonapi = JSONAPI::Document->new($args);
+    my $namespace = delete $args->{namespace} // '';
+    my $api_path = $namespace ? '/' . $namespace : '/';
+    my $jsonapi_cb = sub {
+        my ($c) = @_;
+        my $api_url = $c->url_for($api_path)->to_abs;
+        if ($api_url =~ m|/$|) {
+            chop($api_url);
+        }
+        $args->{api_url} = $api_url;
+        return JSONAPI::Document->new($args);
+    };
 
     $app->helper(
         resource_document => sub {
             my ( $c, $row, $options ) = @_;
-            return $jsonapi->resource_document( $row, $options );
+            return $jsonapi_cb->($c)->resource_document( $row, $options );
         }
     );
 
     $app->helper(
         compound_resource_document => sub {
             my ( $c, $row, $options ) = @_;
-            return $jsonapi->compound_resource_document( $row, $options );
+            return $jsonapi_cb->($c)->compound_resource_document( $row, $options );
         }
     );
 
     $app->helper(
         resource_documents => sub {
             my ( $c, $resultset, $options ) = @_;
-            return $jsonapi->resource_documents( $resultset, $options );
+            return $jsonapi_cb->($c)->resource_documents( $resultset, $options );
         }
     );
 }

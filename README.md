@@ -4,7 +4,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 # VERSION
 
-version 0.4
+version 0.5
 
 # SYNOPSIS
 
