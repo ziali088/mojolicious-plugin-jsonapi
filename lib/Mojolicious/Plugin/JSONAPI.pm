@@ -17,6 +17,8 @@ sub register {
         $jsonapi_args{kebab_case_attrs} = $args->{kebab_case_attrs};
     }
     if (defined($args->{namespace})) {
+        # It's not really a JSONAPI::Document arg, but it's as close as
+        # we'll get to defining a base URL at startup time.
         $jsonapi_args{namespace} = $args->{namespace};
     }
     if (defined($args->{attributes_via})) {
@@ -29,17 +31,21 @@ sub register {
 
     $self->create_route_helpers( $app, $args->{namespace} );
     $self->create_data_helpers($app, \%jsonapi_args);
+    $self->create_request_helpers($app);
     $self->create_error_helpers($app);
 }
 
 sub create_route_helpers {
     my ( $self, $app, $namespace ) = @_;
 
+    my $DEV_MODE = $app->mode ne 'production';
+
     $app->helper(
         resource_routes => sub {
             my ( $c, $spec ) = @_;
             $spec->{resource} || Carp::confess('resource is a required param');
             $spec->{relationships} ||= [];
+            my @DEV_LOGS;
 
             my $resource = Lingua::EN::Inflexion::noun( $spec->{resource} );
             my $resource_singular = $resource->singular;
@@ -56,7 +62,10 @@ sub create_route_helpers {
             my $r = $router->any($base_path)->to( controller => $controller );
             $r->get('/')->to( action => "fetch_${action_plural}" );
             $r->post('/')->to( action => "post_${action_singular}" );
+            push @DEV_LOGS, "GET $base_path/ -> ${controller}#fetch_${action_plural}";
+            push @DEV_LOGS, "POST $base_path/ -> ${controller}#post_${action_singular}";
             foreach my $method (qw/get patch delete/) {
+                push @DEV_LOGS, uc($method) . " $base_path/:${action_singular}_id -> ${controller}#${method}_${action_singular}";
                 $r->$method("/:${action_singular}_id")->to( action => "${method}_${action_singular}" );
             }
 
@@ -65,8 +74,14 @@ sub create_route_helpers {
                 my $relationship_action = $relationship;
                 $relationship_action =~ s/-/_/g;
                 foreach my $method (qw/get post patch delete/) {
+                    push @DEV_LOGS, uc($method) . " ${base_path}${path} -> ${controller}#${method}_related_${relationship_action}";
                     $r->$method($path)->to(action => "${method}_related_${relationship_action}" );
                 }
+            }
+
+            if ( $DEV_MODE ) {
+                $app->log->debug('Created the following JSONAPI routes:');
+                $app->log->debug($_) for @DEV_LOGS;
             }
         }
     );
@@ -137,6 +152,18 @@ sub create_error_helpers {
     );
 }
 
+sub create_request_helpers {
+    my ( $self, $app ) = @_;
+
+    $app->helper(
+        requested_resources => sub {
+            my ($c) = @_;
+            my @include = split(',', $c->param('include') // '');
+            return \@include;
+        }
+    );
+}
+
 1;
 
 __END__
@@ -185,6 +212,8 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
         # POST '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#post_related_email_templates')
         # PATCH '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#patch_related_email_templates')
         # DELETE '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#delete_related_email_templates')
+
+        # If your not in production mode, your $app->log will show the created routes. Useful!
 
         # You can use the following helpers too:
 
@@ -288,6 +317,14 @@ as described in the specification. See L<Error Objects|http://jsonapi.org/format
 
 Can optionally provide a reference to the primary data for the route as well as meta information, which will be added
 to the response as-is. Use C<resource_document> to generate the right structure for this argument.
+
+=head2 requested_resources
+
+Convenience helper for controllers. Takes the query param C<include>, used to indicate what relationships to include in the
+response, and splits it by ',' to return an ArrayRef.
+
+ # GET /api/posts?include=comments,author
+ my $include = $c->requested_resources(); # ['comments', 'author']
 
 =head2 resource_document
 

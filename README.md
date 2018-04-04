@@ -4,7 +4,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 # VERSION
 
-version 0.7
+version 0.8
 
 # SYNOPSIS
 
@@ -44,6 +44,8 @@ version 0.7
         # POST '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#post_related_email_templates')
         # PATCH '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#patch_related_email_templates')
         # DELETE '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#delete_related_email_templates')
+
+        # If your not in production mode, your $app->log will show the created routes. Useful!
 
         # You can use the following helpers too:
 
@@ -139,6 +141,14 @@ as described in the specification. See [Error Objects](http://jsonapi.org/format
 
 Can optionally provide a reference to the primary data for the route as well as meta information, which will be added
 to the response as-is. Use `resource_document` to generate the right structure for this argument.
+
+## requested\_resources
+
+Convenience helper for controllers. Takes the query param `include`, used to indicate what relationships to include in the
+response, and splits it by ',' to return an ArrayRef.
+
+    # GET /api/posts?include=comments,author
+    my $include = $c->requested_resources(); # ['comments', 'author']
 
 ## resource\_document
 
