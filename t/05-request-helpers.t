@@ -33,4 +33,9 @@ subtest 'multiple included resources' => sub {
     $t->get_ok('/?include=comments,author,posts');
 };
 
+subtest 'with dashes' => sub {
+    $test = [qw/author email_templates/];
+    $t->get_ok('/?include=author,email-templates');
+};
+
 done_testing;

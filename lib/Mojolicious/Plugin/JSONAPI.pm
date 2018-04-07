@@ -158,7 +158,9 @@ sub create_request_helpers {
     $app->helper(
         requested_resources => sub {
             my ($c) = @_;
-            my @include = split(',', $c->param('include') // '');
+            my $param = $c->param('include') // '';
+            $param =~ s/-/_/g;
+            my @include = split(',', $param);
             return \@include;
         }
     );
