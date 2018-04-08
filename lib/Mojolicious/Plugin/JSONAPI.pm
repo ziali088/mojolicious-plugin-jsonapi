@@ -57,7 +57,7 @@ sub create_route_helpers {
 
             my $base_path = (!$spec->{router} && $namespace) ? "/$namespace/$resource_plural" : "/$resource_plural";
             my $router = $spec->{router} ? $spec->{router} : $app->routes;
-            my $controller = $spec->{controller} || "api-$resource_plural";
+            my $controller = $spec->{controller} || "api-$action_plural";
 
             my $r = $router->any($base_path)->to( controller => $controller );
             $r->get('/')->to( action => "fetch_${action_plural}" );
