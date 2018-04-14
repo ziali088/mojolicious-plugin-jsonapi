@@ -364,4 +364,8 @@ Available in controllers:
 
 See L<resource_documents|https://metacpan.org/pod/JSONAPI::Document#resource_documents(DBIx::Class::Row-$row,-HashRef-$options)> for usage.
 
+=head1 LICENSE
+
+This code is available under the Perl 5 License.
+
 =cut
