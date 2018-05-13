@@ -135,7 +135,7 @@ sub create_error_helpers {
         render_error => sub {
             my ( $c, $status, $errors, $data, $meta ) = @_;
 
-            unless ( defined($errors) && ref($errors) ne 'ARRAY' ) {
+            unless ( defined($errors) && ref($errors) eq 'ARRAY' ) {
                 $errors = [
                     {
                         status => $status || 500,
@@ -147,7 +147,7 @@ sub create_error_helpers {
             return $c->render(
                 status => $status || 500,
                 json => {
-                    $data ? $data : (),
+                    $data ? %$data : (),
                     $meta ? ( meta => $meta ) : (),
                     errors => $errors,
                 }
