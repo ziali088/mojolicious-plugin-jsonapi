@@ -4,8 +4,8 @@ use Test::Most;
 use JSONAPI::Document;
 
 my $j = JSONAPI::Document->new({
-	api_url => 'http://example.com',
-	data_dir => 't/share',
+    api_url  => 'http://example.com',
+    data_dir => 't/share',
 });
 
 $j->chi->clear();
