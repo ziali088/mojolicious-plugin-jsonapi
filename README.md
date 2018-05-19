@@ -160,13 +160,13 @@ response, and splits it by ',' to return an ArrayRef.
 
 ## requested\_fields
 
-Takes the query params called `fields[]` and creates a HashRef containing all requested fields suitable to pass directly
-to the options of `JSONAPI::Document::resource_document`.
+Takes each query param `fields[TYPE]` and creates a HashRef containing all requested fields for that type.
+Suitable to pass directly to the options of `JSONAPI::Document::resource_document`.
 
-Fields included should be direct attributes of the resource, not its relationships. See `requested_resources`
+Included fields should be direct attributes of the resource, not its relationships. See `requested_resources`
 for that use case.
 
-The main resource in the fields\[\] param should be in its plural form (i.e. 'posts', not 'post'), and related resources
+The main resource should be in the plural form inside the param (i.e. 'posts', not 'post'), and related resources
 in their correct form.
 
     # GET /api/posts?fields[posts]=slug,title&fields[comments]=likes&fields[author]=name,email

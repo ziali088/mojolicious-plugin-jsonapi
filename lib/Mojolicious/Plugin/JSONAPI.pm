@@ -369,13 +369,13 @@ response, and splits it by ',' to return an ArrayRef.
 
 =head2 requested_fields
 
-Takes the query params called C<fields[]> and creates a HashRef containing all requested fields suitable to pass directly
-to the options of C<JSONAPI::Document::resource_document>.
+Takes each query param C<fields[TYPE]> and creates a HashRef containing all requested fields for that type.
+Suitable to pass directly to the options of C<JSONAPI::Document::resource_document>.
 
-Fields included should be direct attributes of the resource, not its relationships. See C<requested_resources>
+Included fields should be direct attributes of the resource, not its relationships. See C<requested_resources>
 for that use case.
 
-The main resource in the fields[] param should be in its plural form (i.e. 'posts', not 'post'), and related resources
+The main resource should be in the plural form inside the param (i.e. 'posts', not 'post'), and related resources
 in their correct form.
 
  # GET /api/posts?fields[posts]=slug,title&fields[comments]=likes&fields[author]=name,email
