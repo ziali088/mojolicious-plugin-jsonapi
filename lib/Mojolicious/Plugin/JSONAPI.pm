@@ -364,13 +364,15 @@ to the response as-is. Use C<resource_document> to generate the right structure 
 Convenience helper for controllers. Takes the query param C<include>, used to indicate what relationships to include in the
 response, and splits it by ',' to return an ArrayRef.
 
- # GET /api/posts?include=comments,author
+ GET /api/posts?include=comments,author
  my $include = $c->requested_resources(); # ['comments', 'author']
 
 =head2 requested_fields
 
-Takes each query param C<fields[TYPE]> and creates a HashRef containing all requested fields for that type.
-Suitable to pass directly to the options of C<JSONAPI::Document::resource_document>.
+Takes each query param C<fields[TYPE]> and creates a HashRef containing all its requested fields along with
+any relationship fields. This is useful if you only want to return a subset of attributes for a resource.
+
+The HashRef produced is suitable to pass directly to the options of C<JSONAPI::Document::resource_document>.
 
 Included fields should be direct attributes of the resource, not its relationships. See C<requested_resources>
 for that use case.
@@ -378,8 +380,10 @@ for that use case.
 The main resource should be in the plural form inside the param (i.e. 'posts', not 'post'), and related resources
 in their correct form.
 
- # GET /api/posts?fields[posts]=slug,title&fields[comments]=likes&fields[author]=name,email
+ GET /api/posts?fields[posts]=slug,title&fields[comments]=likes&fields[author]=name,email
+
  my $fields = $c->requested_fields();
+
  # Out:
  {
     fields => ['slug', 'title'],
