@@ -4,7 +4,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 # VERSION
 
-version 1.3
+version 1.4
 
 # SYNOPSIS
 
@@ -157,6 +157,28 @@ response, and splits it by ',' to return an ArrayRef.
 
     # GET /api/posts?include=comments,author
     my $include = $c->requested_resources(); # ['comments', 'author']
+
+## requested\_fields
+
+Takes the query params called `fields[]` and creates a HashRef containing all requested fields suitable to pass directly
+to the options of `JSONAPI::Document::resource_document`.
+
+Fields included should be direct attributes of the resource, not its relationships. See `requested_resources`
+for that use case.
+
+The main resource in the fields\[\] param should be in its plural form (i.e. 'posts', not 'post'), and related resources
+in their correct form.
+
+    # GET /api/posts?fields[posts]=slug,title&fields[comments]=likes&fields[author]=name,email
+    my $fields = $c->requested_fields();
+    # Out:
+    {
+       fields => ['slug', 'title'],
+       related_fields => {
+           comments => ['likes'],
+           author => ['name', 'email']
+       }
+    }
 
 ## resource\_document
 
