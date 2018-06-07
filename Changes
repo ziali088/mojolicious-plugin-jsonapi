@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+1.6       2018-06-08 00:48:57+01:00 Europe/London
+- Fix bug where requested_fields would return all main resource keys in related_fields
+if the namespace was longer than one segment. Thanks pspencer for the bug report!
+
 1.5       2018-06-03 15:24:37+01:00 Europe/London
 - Support nested relationships in requested_resources
 - Minimum dependency of 1.4 for JSONAPI::Document due to major refactoring
