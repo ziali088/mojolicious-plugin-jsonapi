@@ -188,7 +188,7 @@ sub create_request_helpers {
             my $path          = $c->tx->req->url->path;
             my $main_resource = $path->parts->[0];
             if ($namespace) {
-                my $idx = length(split('/', $namespace)) - 1;
+                my $idx = split('/', $namespace) - 1;
                 $main_resource = $path->parts->[$idx + 1];
             }
 
