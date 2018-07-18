@@ -22,10 +22,6 @@ sub register {
         # we'll get to defining a base URL at startup time.
         $jsonapi_args{namespace} = $args->{namespace};
     }
-    unless ($args->{data_dir}) {
-        Carp::confess('Argument missing: data_dir');
-    }
-    $jsonapi_args{data_dir} = $args->{data_dir};
 
     # Detect application/vnd.api+json content type, fallback to application/json
     $app->types->type(json => ['application/vnd.api+json', 'application/json']);
@@ -224,7 +220,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
         $self->plugin('JSONAPI', {
             namespace => 'api',
-            data_dir => '/path/to/data/dir',
+            kebab_case_attrs => 1,
         });
 
         $self->resource_routes({
@@ -277,11 +273,6 @@ See L<http://jsonapi.org/> for the JSON API specification. At the time of writin
 =head1 OPTIONS
 
 =over
-
-=item C<data_dir>
-
-Required; This should be a path to a directory which is not version controlled (if you use stuff like that). Used
-by C<JSONAPI::Document> to store computed document types.
 
 =item C<namespace>
 
