@@ -4,7 +4,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 # VERSION
 
-version 2.2
+version 2.3
 
 # SYNOPSIS
 
@@ -89,6 +89,7 @@ Creates a set of routes for the given resource. `$spec` is a hash reference that
         resource        => 'post', # name of resource, required
         controller      => 'api-posts', # name of controller, defaults to "api-{resource_plural}"
         relationships   => ['author', 'comments'], # default is []
+        http_verbs      => ['get', 'post'], # default is ['get', 'post', 'patch', 'delete']
     }
 
 - `resource _Str_`
@@ -131,6 +132,14 @@ Creates a set of routes for the given resource. `$spec` is a hash reference that
     **NOTE**: Your relationships should be in the correct form (singular/plural) based on the relationship in your
     schema management system. For example, if you have a resource called 'post' and it has many 'comments', make
     sure comments is passed in as a plural noun here.
+
+- `http_verbs _ArrayRef_`
+
+    The HTTP verbs/methods to use when creating the resources routes. Defaults to `GET`, `POST`, `PATCH` and `DELETE`, where
+    `GET` is both for the collection route as well as the single resource route (e.g. `/api/authors` and `/api/authors/:author_id`).
+
+    Specifying this will not, if provided, affect the relationship routes that will be created. Those will have routes created for
+    all verbs regardless.
 
 ## render\_error(_Str_ $status, _ArrayRef|Str_ $errors, _HashRef_ $meta?)
 
@@ -205,6 +214,10 @@ Available in controllers:
     $c->resource_documents($dbix_resultset, $options);
 
 See [resource\_documents](https://metacpan.org/pod/JSONAPI::Document#resource_documents\(DBIx::Class::Row-$row,-HashRef-$options\)) for usage.
+
+# TODO
+
+- Allow specifying `http_verbs` in the `resource_routes` helper for relationships.
 
 # LICENSE
 
