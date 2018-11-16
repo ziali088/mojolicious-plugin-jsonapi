@@ -72,7 +72,7 @@ See [http://jsonapi.org/](http://jsonapi.org/) for the JSON API specification. A
 - `namespace`
 
     The prefix that's added to all routes, defaults to 'api'. You can also provided an empty string as the namespace,
-    meaing no prefix will be added.
+    meaning no prefix will be added.
 
 - `kebab_case_attrs`
 
