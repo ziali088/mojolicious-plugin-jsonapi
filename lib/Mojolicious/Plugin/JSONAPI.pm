@@ -74,14 +74,23 @@ sub create_route_helpers {
                     uc($method) . " $base_path/:${action_singular}_id -> ${controller}#${method}_${action_singular}";
             }
 
+            # Make routes that JSON API link URLs can point to.
+            # Note that both self and related links point to the same action
+            # because I think they're for the same purpose.
             foreach my $relationship (@{ $spec->{relationships} }) {
-                my $path                = "/:${action_singular}_id/relationships/${relationship}";
+                my $path_for_self       = "/:${action_singular}_id/relationships/${relationship}";
+                my $path_for_related    = "/:${action_singular}_id/${relationship}";
                 my $relationship_action = $relationship;
                 $relationship_action =~ s/-/_/g;
                 foreach my $method (qw/get post patch delete/) {
                     push @DEV_LOGS,
-                        uc($method) . " ${base_path}${path} -> ${controller}#${method}_related_${relationship_action}";
-                    $r->$method($path)->to(action => "${method}_related_${relationship_action}");
+                        uc($method)
+                        . " ${base_path}${path_for_self} -> ${controller}#${method}_related_${relationship_action}";
+                    push @DEV_LOGS,
+                        uc($method)
+                        . " ${base_path}${path_for_related} -> ${controller}#${method}_related_${relationship_action}";
+                    $r->$method($path_for_self)->to(action => "${method}_related_${relationship_action}");
+                    $r->$method($path_for_related)->to(action => "${method}_related_${relationship_action}");
                 }
             }
 
@@ -344,7 +353,12 @@ Usage:
 
 The relationships belonging to the resource. Defaults to an empty array ref.
 
-Specifying C<relationships> will create additional routes that fall under the resource.
+Specifying C<relationships> will create additional routes that fall under the resource. These URLs
+can then be used to reference L<self|https://jsonapi.org/format/#document-resource-object-relationships>
+I<OR> L<related|https://jsonapi.org/format/#document-resource-object-related-resource-links> routes, as
+both will point to the same controller action. So in essence, C</api/posts/1/relationships/author> and
+C</api/posts/1/author> will go to the action C<{http_method}_related_author>. This is because in my
+opinion they're different routes with the same purpose (actioning on the related resource).
 
 B<NOTE>: Your relationships should be in the correct form (singular/plural) based on the relationship in your
 schema management system. For example, if you have a resource called 'post' and it has many 'comments', make
