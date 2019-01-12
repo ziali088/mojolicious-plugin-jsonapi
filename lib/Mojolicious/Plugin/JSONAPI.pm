@@ -353,12 +353,12 @@ Usage:
 
 The relationships belonging to the resource. Defaults to an empty array ref.
 
-Specifying C<relationships> will create additional routes that fall under the resource. These URLs
+Specifying C<relationships> will create additional routes that fall under the resource. These
 can then be used to reference L<self|https://jsonapi.org/format/#document-resource-object-relationships>
-I<OR> L<related|https://jsonapi.org/format/#document-resource-object-related-resource-links> routes, as
-both will point to the same controller action. So in essence, C</api/posts/1/relationships/author> and
-C</api/posts/1/author> will go to the action C<{http_method}_related_author>. This is because in my
-opinion they're different routes with the same purpose (actioning on the related resource).
+I<or> L<related|https://jsonapi.org/format/#document-resource-object-related-resource-links> routes, as
+both will point to the same controller action i.e. C</api/posts/1/relationships/author> and
+C</api/posts/1/author> will go to C<Api::Posts::{http_method}_related_author>. This is because in my
+opinion they're different routes with the same purpose, which is to action on the related resource.
 
 B<NOTE>: Your relationships should be in the correct form (singular/plural) based on the relationship in your
 schema management system. For example, if you have a resource called 'post' and it has many 'comments', make
